@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace TranslationManagement.Api
 {
@@ -12,8 +9,13 @@ namespace TranslationManagement.Api
             var host = CreateHostBuilder(args).Build();
 
             // automatic startup database migration
-            var scope = host.Services.GetService<IServiceScopeFactory>().CreateScope();
-            scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+            var scope = host.Services.GetService<IServiceScopeFactory>()?.CreateScope();
+            var dbContext = scope?.ServiceProvider.GetRequiredService<AppDbContext>();
+            if (dbContext == null)
+            {
+                throw new ArgumentNullException("Scope or AppDbContext cannot be null");
+            }
+            dbContext.Database.Migrate();
 
             host.Run();
         }

@@ -1,46 +1,27 @@
-﻿using System;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
+using TranslationManagement.Api.Models;
 
-namespace TranslationManagement.Api.Controlers
+namespace TranslationManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/TranslatorsManagement/[action]")]
     public class TranslatorManagementController : ControllerBase
     {
-        public class TranslatorModel
-        {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public string HourlyRate { get; set; }
-            public string Status { get; set; }
-            public string CreditCardNumber { get; set; }
-        }
-
-        public static readonly string[] TranslatorStatuses = { "Applicant", "Certified", "Deleted" };
-
         private readonly ILogger<TranslatorManagementController> _logger;
         private AppDbContext _context;
 
         public TranslatorManagementController(IServiceScopeFactory scopeFactory, ILogger<TranslatorManagementController> logger)
         {
-            _context = scopeFactory.CreateScope().ServiceProvider.GetService<AppDbContext>();
+            var context = scopeFactory.CreateScope().ServiceProvider.GetService<AppDbContext>();
+            _context = context ?? throw new ArgumentNullException("AppDbContext service cannot be null");
             _logger = logger;
         }
 
         [HttpGet]
-        public TranslatorModel[] GetTranslators()
-        {
-            return _context.Translators.ToArray();
-        }
+        public TranslatorModel[] GetTranslators() => _context.Translators.ToArray();
 
         [HttpGet]
-        public TranslatorModel[] GetTranslatorsByName(string name)
-        {
-            return _context.Translators.Where(t => t.Name == name).ToArray();
-        }
+        public TranslatorModel[] GetTranslatorsByName(string name) => _context.Translators.Where(t => t.Name == name).ToArray();
 
         [HttpPost]
         public bool AddTranslator(TranslatorModel translator)
@@ -48,12 +29,12 @@ namespace TranslationManagement.Api.Controlers
             _context.Translators.Add(translator);
             return _context.SaveChanges() > 0;
         }
-        
+
         [HttpPost]
         public string UpdateTranslatorStatus(int Translator, string newStatus = "")
         {
-            _logger.LogInformation("User status update request: " + newStatus + " for user " + Translator.ToString());
-            if (TranslatorStatuses.Where(status => status == newStatus).Count() == 0)
+            _logger.LogInformation($"User status update request: {newStatus} for user {Translator.ToString()}");
+            if (!Enum.IsDefined(typeof(TranslatorStatuses), newStatus))
             {
                 throw new ArgumentException("unknown status");
             }
