@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using TranslationManagement.Api.Models;
 using External.ThirdParty.Services;
+using Microsoft.VisualBasic;
 
 namespace TranslationManagement.Api.Controllers
 {
@@ -22,7 +23,7 @@ namespace TranslationManagement.Api.Controllers
         public IActionResult GetJobs() => Ok(_context.TranslationJobs.ToArray());
 
         [HttpPost]
-        public IActionResult CreateJob([FromBody] TranslationJob job)
+        public async Task<IActionResult> CreateJob([FromForm] TranslationJob job)
         {
             job.Status = JobStatuses.New.ToString();
             SetPrice(job);
@@ -30,7 +31,7 @@ namespace TranslationManagement.Api.Controllers
             var success = _context.SaveChanges() > 0;
             if (success)
             {
-                NotifyJobCreation(job.Id);
+                await NotifyJobCreation(job.Id);
                 _logger.LogInformation("New job notification sent");
             }
 
@@ -38,7 +39,7 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateJobWithFile(IFormFile file, string? customer)
+        public async Task<IActionResult> CreateJobWithFile([FromForm] IFormFile file, [FromForm] string? customer)
         {
             var reader = new StreamReader(file.OpenReadStream());
             string? content;
@@ -72,7 +73,7 @@ namespace TranslationManagement.Api.Controllers
 
             SetPrice(newJob);
 
-            return CreateJob(newJob);
+            return await CreateJob(newJob);
         }
 
         [HttpPost]
@@ -106,11 +107,19 @@ namespace TranslationManagement.Api.Controllers
             job.Price = job.OriginalContent.Length * PricePerCharacter;
         }
 
-        private void NotifyJobCreation(int jobId)
+        private async Task NotifyJobCreation(int jobId)
         {
             var notificationSvc = new UnreliableNotificationService();
-            while (!notificationSvc.SendNotification($"Job created: {jobId}").Result)
+            bool isSuccess = false;
+            while (true)
             {
+                try
+                {
+                    isSuccess = await notificationSvc.SendNotification($"Job created: {jobId}");
+                }
+                catch { }
+
+                if (isSuccess) break;
             }
         }
 
