@@ -48,7 +48,7 @@ namespace TranslationManagement.Api.Controllers
             (content, customer) = FileProcessorManager.Process(file.FileName, reader, customer);
             if (content == null || customer == null)
             {
-                throw new ArgumentNullException("params cannot be null");
+                return BadRequest("params cannot be null");
             }
 
             var newJob = new TranslationJob()
@@ -57,7 +57,6 @@ namespace TranslationManagement.Api.Controllers
                 TranslatedContent = "",
                 CustomerName = customer,
             };
-
             SetPrice(newJob);
 
             return await CreateJob(newJob);
