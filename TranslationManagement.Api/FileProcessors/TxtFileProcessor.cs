@@ -2,9 +2,14 @@ namespace TranslationManagement.Api.FileProcessors
 {
   public class TxtFileProcessor : IFileProcessor
   {
-    public string ProcessFile(StreamReader reader)
+    public bool CanProcess(string filename)
     {
-      return reader.ReadToEnd();
+      return filename.ToLower().EndsWith(".txt");
+    }
+
+    public (string?, string?) ProcessFile(StreamReader reader, string? customer)
+    {
+      return (reader.ReadToEnd(), customer);
     }
   }
 }

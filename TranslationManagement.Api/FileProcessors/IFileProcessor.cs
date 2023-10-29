@@ -2,6 +2,7 @@ namespace TranslationManagement.Api.FileProcessors
 {
   public interface IFileProcessor
   {
-    string ProcessFile(StreamReader reader);
+    public bool CanProcess(string filename);
+    public (string?, string?) ProcessFile(StreamReader reader, string? customer);
   }
 }

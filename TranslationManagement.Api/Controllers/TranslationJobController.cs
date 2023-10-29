@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using TranslationManagement.Api.Models;
 using External.ThirdParty.Services;
 using Microsoft.VisualBasic;
+using TranslationManagement.Api.FileProcessors;
 
 namespace TranslationManagement.Api.Controllers
 {
@@ -44,21 +45,7 @@ namespace TranslationManagement.Api.Controllers
             var reader = new StreamReader(file.OpenReadStream());
             string? content;
 
-            if (file.FileName.EndsWith(".txt"))
-            {
-                content = reader.ReadToEnd();
-            }
-            else if (file.FileName.EndsWith(".xml"))
-            {
-                var xdoc = XDocument.Parse(reader.ReadToEnd());
-                content = xdoc.Root?.Element("Content")?.Value;
-                customer = xdoc.Root?.Element("Customer")?.Value.Trim();
-            }
-            else
-            {
-                throw new NotSupportedException("unsupported file");
-            }
-
+            (content, customer) = FileProcessorManager.Process(file.FileName, reader, customer);
             if (content == null || customer == null)
             {
                 throw new ArgumentNullException("params cannot be null");
