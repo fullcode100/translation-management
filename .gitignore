@@ -1,0 +1,17 @@
+node_modules
+lock.json
+bin
+obj
+dist
+*.user
+.vs
+wwwroot
+wwwroot_node
+.tmp
+/Moravia.UM.Demo
+/Moravia.UM.MongoDB/log/*
+/Moravia.UM.MongoDB/db/*
+.vscode
+*.code-workspace
+*.nupkg
+.DS_Store
