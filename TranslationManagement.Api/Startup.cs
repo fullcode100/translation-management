@@ -27,6 +27,8 @@ namespace TranslationManagement.Api
             });
 
             services.AddScoped<IDataRepository, EFDataRepository>();
+
+            services.AddResponseCaching();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

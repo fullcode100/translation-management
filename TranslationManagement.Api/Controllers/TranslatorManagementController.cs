@@ -17,33 +17,40 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpGet]
-        public Translator[] GetTranslatorsByName([FromBody] string? name)
+        public IActionResult GetTranslatorsByName([FromBody] string? name)
         {
             if (name != null)
             {
-                return repository.Translators.Where(t => t.Name == name).ToArray();
+                return Ok(repository.Translators.Where(t => t.Name == name).ToArray());
             }
-            return repository.Translators.ToArray();
+            return Ok(repository.Translators.ToArray());
         }
 
         [HttpPost]
-        public bool AddTranslator(Translator translator)
+        public IActionResult AddTranslator(Translator translator)
         {
-            return repository.CreateTranslator(translator);
+            return Ok(repository.CreateTranslator(translator));
         }
 
         [HttpPut("{translatorId}")]
-        public string UpdateTranslatorStatus([FromBody] string newStatus, int translatorId)
+        public IActionResult UpdateTranslatorStatus([FromBody] string newStatus, int translatorId)
         {
             _logger.LogInformation($"User status update request: {newStatus} for user {translatorId.ToString()}");
             if (!IsValidTranslatorStatus(newStatus))
             {
-                throw new ArgumentException("unknown status");
+                return BadRequest("unknown status");
             }
 
-            repository.UpdateTranslatorStatus(translatorId, newStatus);
+            try
+            {
+                repository.UpdateTranslatorStatus(translatorId, newStatus);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            return "updated";
+            return Ok("updated");
         }
 
         public static bool IsValidTranslatorStatus(string status)
