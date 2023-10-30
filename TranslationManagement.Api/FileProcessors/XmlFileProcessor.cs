@@ -9,9 +9,9 @@ namespace TranslationManagement.Api.FileProcessors
       return filename.ToLower().EndsWith(".xml");
     }
 
-    public (string?, string?) ProcessFile(StreamReader reader, string? customer)
+    public async Task<(string?, string?)> ProcessFile(StreamReader reader, string? customer)
     {
-      var xdoc = XDocument.Parse(reader.ReadToEnd());
+      var xdoc = XDocument.Parse(await reader.ReadToEndAsync());
       return (xdoc.Root?.Element("Content")?.Value, customer);
     }
   }

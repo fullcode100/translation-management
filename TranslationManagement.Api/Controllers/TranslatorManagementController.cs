@@ -27,13 +27,13 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddTranslator(Translator translator)
+        public async Task<IActionResult> AddTranslator(Translator translator)
         {
-            return Ok(repository.CreateTranslator(translator));
+            return Ok(await repository.CreateTranslator(translator));
         }
 
         [HttpPut("{translatorId}")]
-        public IActionResult UpdateTranslatorStatus([FromBody] string newStatus, int translatorId)
+        public async Task<IActionResult> UpdateTranslatorStatus([FromBody] string newStatus, int translatorId)
         {
             _logger.LogInformation($"User status update request: {newStatus} for user {translatorId.ToString()}");
             if (!IsValidTranslatorStatus(newStatus))
@@ -43,7 +43,7 @@ namespace TranslationManagement.Api.Controllers
 
             try
             {
-                repository.UpdateTranslatorStatus(translatorId, newStatus);
+                await repository.UpdateTranslatorStatus(translatorId, newStatus);
             }
             catch (Exception ex)
             {

@@ -7,9 +7,9 @@ namespace TranslationManagement.Api.FileProcessors
       return filename.ToLower().EndsWith(".txt");
     }
 
-    public (string?, string?) ProcessFile(StreamReader reader, string? customer)
+    public async Task<(string?, string?)> ProcessFile(StreamReader reader, string? customer)
     {
-      return (reader.ReadToEnd(), customer);
+      return (await reader.ReadToEndAsync(), customer);
     }
   }
 }

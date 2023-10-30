@@ -26,7 +26,7 @@ namespace TranslationManagement.Api.Controllers
         {
             job.Status = JobStatuses.New.ToString();
             SetPrice(job);
-            var success = repository.CreateTranslationJob(job);
+            var success = await repository.CreateTranslationJob(job);
             if (success)
             {
                 await NotifyJobCreation(job.Id);
@@ -42,7 +42,7 @@ namespace TranslationManagement.Api.Controllers
             var reader = new StreamReader(file.OpenReadStream());
             string? content;
 
-            (content, customer) = FileProcessorManager.Process(file.FileName, reader, customer);
+            (content, customer) = await FileProcessorManager.Process(file.FileName, reader, customer);
             if (content == null || customer == null)
             {
                 return BadRequest("params cannot be null");
@@ -60,7 +60,7 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateJobStatus([FromForm] int jobId, [FromForm] int translatorId, [FromForm] string newStatus)
+        public async Task<IActionResult> UpdateJobStatus([FromForm] int jobId, [FromForm] int translatorId, [FromForm] string newStatus)
         {
             _logger.LogInformation($"Job status update request received: {newStatus} for job {jobId} by translator {translatorId}");
             if (!IsValidJobStatus(newStatus))
@@ -70,7 +70,7 @@ namespace TranslationManagement.Api.Controllers
 
             try
             {
-                repository.UpdateTranslationJobStatus(jobId, newStatus);
+                await repository.UpdateTranslationJobStatus(jobId, newStatus);
             }
             catch (Exception ex)
             {

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using TranslationManagement.Api.Controllers;
 
 namespace TranslationManagement.Api.Models
@@ -14,21 +15,23 @@ namespace TranslationManagement.Api.Models
     public IQueryable<TranslationJob> TranslationJobs => _dbContext.TranslationJobs;
     public IQueryable<Translator> Translators => _dbContext.Translators;
 
-    public bool CreateTranslationJob(TranslationJob job)
+    public async Task<bool> CreateTranslationJob(TranslationJob job)
     {
-      _dbContext.TranslationJobs.Add(job);
-      return _dbContext.SaveChanges() > 0;
+      await _dbContext.TranslationJobs.AddAsync(job);
+      var result = await _dbContext.SaveChangesAsync();
+      return result > 0;
     }
 
-    public bool CreateTranslator(Translator translator)
+    public async Task<bool> CreateTranslator(Translator translator)
     {
-      _dbContext.Translators.Add(translator);
-      return _dbContext.SaveChanges() > 0;
+      await _dbContext.Translators.AddAsync(translator);
+      var result = _dbContext.SaveChanges();
+      return result > 0;
     }
 
-    public void UpdateTranslationJobStatus(int jobId, string newStatus)
+    public async Task UpdateTranslationJobStatus(int jobId, string newStatus)
     {
-      var job = _dbContext.TranslationJobs.Single(j => j.Id == jobId);
+      var job = await _dbContext.TranslationJobs.SingleAsync(j => j.Id == jobId);
       if (job == null)
       {
         throw new Exception("job does not exist");
@@ -40,19 +43,19 @@ namespace TranslationManagement.Api.Models
       }
 
       job.Status = newStatus;
-      _dbContext.SaveChanges();
+      await _dbContext.SaveChangesAsync();
     }
 
-    public void UpdateTranslatorStatus(int translatorId, string newStatus)
+    public async Task UpdateTranslatorStatus(int translatorId, string newStatus)
     {
-      var job = _dbContext.Translators.Single(j => j.Id == translatorId);
+      var job = await _dbContext.Translators.SingleAsync(j => j.Id == translatorId);
       if (job == null)
       {
         throw new Exception("job does not exist");
       }
 
       job.Status = newStatus;
-      _dbContext.SaveChanges();
+      await _dbContext.SaveChangesAsync();
     }
   }
 }

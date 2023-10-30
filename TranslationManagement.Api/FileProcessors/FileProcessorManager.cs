@@ -8,13 +8,13 @@ namespace TranslationManagement.Api.FileProcessors
       // Add your custom file processor object here to extend
     };
 
-    public static (string?, string?) Process(string filename, StreamReader reader, string? customer)
+    public static async Task<(string?, string?)> Process(string filename, StreamReader reader, string? customer)
     {
       foreach (var processor in FileProcessors)
       {
         if (processor.CanProcess(filename))
         {
-          return processor.ProcessFile(reader, customer);
+          return await processor.ProcessFile(reader, customer);
         }
       }
 
