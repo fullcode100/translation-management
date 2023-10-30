@@ -1,10 +1,10 @@
-namespace UnitTests;
-
-public class UnitTest1
+namespace TranslationManagement.Api
 {
-    [Fact]
-    public void Test1()
+    public class UnitTest1
     {
-        Assert.Equal(4, 2 + 2);
+        [Fact]
+        public void Test1()
+        {
+        }
     }
 }

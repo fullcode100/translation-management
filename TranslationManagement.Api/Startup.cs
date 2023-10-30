@@ -20,8 +20,7 @@ namespace TranslationManagement.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TranslationManagement.Api", Version = "v1" });
             });
 
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite("Data Source=TranslationAppDatabase.db"));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlite(Configuration["ConnectionString:TranslationDB"]));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
