@@ -7,50 +7,46 @@ namespace TranslationManagement.Api.Controllers
     [Route("api/translators")]
     public class TranslatorManagementController : ControllerBase
     {
+        private readonly IDataRepository repository;
         private readonly ILogger<TranslatorManagementController> _logger;
-        private AppDbContext _context;
 
-        public TranslatorManagementController(IServiceScopeFactory scopeFactory, ILogger<TranslatorManagementController> logger)
+        public TranslatorManagementController(IDataRepository repo, ILogger<TranslatorManagementController> logger)
         {
-            var context = scopeFactory.CreateScope().ServiceProvider.GetService<AppDbContext>();
-            _context = context ?? throw new ArgumentNullException("AppDbContext service cannot be null");
+            repository = repo;
             _logger = logger;
         }
 
         [HttpGet]
-        public TranslatorModel[] GetTranslatorsByName([FromBody] string? name)
+        public Translator[] GetTranslatorsByName([FromBody] string? name)
         {
             if (name != null)
             {
-                return _context.Translators.Where(t => t.Name == name).ToArray();
+                return repository.Translators.Where(t => t.Name == name).ToArray();
             }
-            return _context.Translators.ToArray();
+            return repository.Translators.ToArray();
         }
 
         [HttpPost]
-        public bool AddTranslator(TranslatorModel translator)
+        public bool AddTranslator(Translator translator)
         {
-            _context.Translators.Add(translator);
-            return _context.SaveChanges() > 0;
+            return repository.CreateTranslator(translator);
         }
 
-        [HttpPut("{translator}")]
-        public string UpdateTranslatorStatus([FromBody] string newStatus, int translator)
+        [HttpPut("{translatorId}")]
+        public string UpdateTranslatorStatus([FromBody] string newStatus, int translatorId)
         {
-            _logger.LogInformation($"User status update request: {newStatus} for user {translator.ToString()}");
+            _logger.LogInformation($"User status update request: {newStatus} for user {translatorId.ToString()}");
             if (!IsValidTranslatorStatus(newStatus))
             {
                 throw new ArgumentException("unknown status");
             }
 
-            var job = _context.Translators.Single(j => j.Id == translator);
-            job.Status = newStatus;
-            _context.SaveChanges();
+            repository.UpdateTranslatorStatus(translatorId, newStatus);
 
             return "updated";
         }
 
-        private bool IsValidTranslatorStatus(string status)
+        public static bool IsValidTranslatorStatus(string status)
         {
             return Enum.IsDefined(typeof(TranslatorStatuses), status);
         }

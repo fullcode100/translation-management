@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using TranslationManagement.Api.Models;
 
 namespace TranslationManagement.Api
 {
@@ -20,7 +21,12 @@ namespace TranslationManagement.Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TranslationManagement.Api", Version = "v1" });
             });
 
-            services.AddDbContext<AppDbContext>(options => options.UseSqlite(Configuration["ConnectionString:TranslationDB"]));
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlite(Configuration["ConnectionString:TranslationDB"]);
+            });
+
+            services.AddScoped<IDataRepository, EFDataRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

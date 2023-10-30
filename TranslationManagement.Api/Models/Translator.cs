@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TranslationManagement.Api.Models
 {
-  public class TranslatorModel
+  public class Translator
   {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

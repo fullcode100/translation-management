@@ -9,25 +9,24 @@ namespace TranslationManagement.Api.Controllers
     [Route("api/jobs")]
     public class TranslationJobController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IDataRepository repository;
         private readonly ILogger<TranslatorManagementController> _logger;
 
-        public TranslationJobController(AppDbContext context, ILogger<TranslatorManagementController> logger)
+        public TranslationJobController(IDataRepository repo, ILogger<TranslatorManagementController> logger)
         {
-            _context = context;
+            repository = repo;
             _logger = logger;
         }
 
         [HttpGet]
-        public IActionResult GetJobs() => Ok(_context.TranslationJobs.ToArray());
+        public IActionResult GetJobs() => Ok(repository.TranslationJobs.ToArray());
 
         [HttpPost]
         public async Task<IActionResult> CreateJob(TranslationJob job)
         {
             job.Status = JobStatuses.New.ToString();
             SetPrice(job);
-            _context.TranslationJobs.Add(job);
-            var success = _context.SaveChanges() > 0;
+            var success = repository.CreateTranslationJob(job);
             if (success)
             {
                 await NotifyJobCreation(job.Id);
@@ -69,19 +68,14 @@ namespace TranslationManagement.Api.Controllers
                 return BadRequest("invalid status");
             }
 
-            var job = _context.TranslationJobs.SingleOrDefault(j => j.Id == jobId);
-            if (job == null)
+            try
             {
-                return NotFound();
+                repository.UpdateTranslationJobStatus(jobId, newStatus);
             }
-
-            if (IsInvalidStatusChange(job.Status, newStatus))
+            catch (Exception ex)
             {
-                return BadRequest("invalid status change");
+                return BadRequest(ex.Message);
             }
-
-            job.Status = newStatus;
-            _context.SaveChanges();
             return Ok("updated");
         }
 
@@ -107,12 +101,12 @@ namespace TranslationManagement.Api.Controllers
             }
         }
 
-        private bool IsValidJobStatus(string status)
+        public static bool IsValidJobStatus(string status)
         {
             return Enum.IsDefined(typeof(JobStatuses), status);
         }
 
-        private bool IsInvalidStatusChange(string currentStatus, string newStatus)
+        public static bool IsInvalidStatusChange(string currentStatus, string newStatus)
         {
             return (currentStatus == JobStatuses.New.ToString() && newStatus == JobStatuses.Completed.ToString()) ||
                    currentStatus == JobStatuses.Completed.ToString() || newStatus == JobStatuses.New.ToString();
