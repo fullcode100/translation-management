@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleData", "SampleData", 
 		job.xml = job.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{B7E15777-5BB8-436F-A21A-52C4175F40BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,10 @@ Global
 		{173F3433-4139-404D-A843-BAF43F6164FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{173F3433-4139-404D-A843-BAF43F6164FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{173F3433-4139-404D-A843-BAF43F6164FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7E15777-5BB8-436F-A21A-52C4175F40BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7E15777-5BB8-436F-A21A-52C4175F40BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7E15777-5BB8-436F-A21A-52C4175F40BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7E15777-5BB8-436F-A21A-52C4175F40BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
