@@ -29,7 +29,7 @@ namespace TranslationManagement.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTranslator(Translator translator)
         {
-            return Ok(await repository.CreateTranslator(translator));
+            return Ok(await repository.CreateTranslatorAsync(translator));
         }
 
         [HttpPut("{translatorId}")]
@@ -43,7 +43,7 @@ namespace TranslationManagement.Api.Controllers
 
             try
             {
-                await repository.UpdateTranslatorStatus(translatorId, newStatus);
+                await repository.UpdateTranslatorStatusAsync(translatorId, newStatus);
             }
             catch (Exception ex)
             {

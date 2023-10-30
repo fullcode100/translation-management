@@ -26,7 +26,7 @@ namespace TranslationManagement.Api.Controllers
         {
             job.Status = JobStatuses.New.ToString();
             SetPrice(job);
-            var success = await repository.CreateTranslationJob(job);
+            var success = await repository.CreateTranslationJobAsync(job);
             if (success)
             {
                 await NotifyJobCreation(job.Id);
@@ -70,7 +70,7 @@ namespace TranslationManagement.Api.Controllers
 
             try
             {
-                await repository.UpdateTranslationJobStatus(jobId, newStatus);
+                await repository.UpdateTranslationJobStatusAsync(jobId, newStatus);
             }
             catch (Exception ex)
             {

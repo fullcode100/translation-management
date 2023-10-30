@@ -15,21 +15,21 @@ namespace TranslationManagement.Api.Models
     public IQueryable<TranslationJob> TranslationJobs => _dbContext.TranslationJobs;
     public IQueryable<Translator> Translators => _dbContext.Translators;
 
-    public async Task<bool> CreateTranslationJob(TranslationJob job)
+    public async Task<bool> CreateTranslationJobAsync(TranslationJob job)
     {
       await _dbContext.TranslationJobs.AddAsync(job);
       var result = await _dbContext.SaveChangesAsync();
       return result > 0;
     }
 
-    public async Task<bool> CreateTranslator(Translator translator)
+    public async Task<bool> CreateTranslatorAsync(Translator translator)
     {
       await _dbContext.Translators.AddAsync(translator);
       var result = _dbContext.SaveChanges();
       return result > 0;
     }
 
-    public async Task UpdateTranslationJobStatus(int jobId, string newStatus)
+    public async Task UpdateTranslationJobStatusAsync(int jobId, string newStatus)
     {
       var job = await _dbContext.TranslationJobs.SingleAsync(j => j.Id == jobId);
       if (job == null)
@@ -46,7 +46,7 @@ namespace TranslationManagement.Api.Models
       await _dbContext.SaveChangesAsync();
     }
 
-    public async Task UpdateTranslatorStatus(int translatorId, string newStatus)
+    public async Task UpdateTranslatorStatusAsync(int translatorId, string newStatus)
     {
       var job = await _dbContext.Translators.SingleAsync(j => j.Id == translatorId);
       if (job == null)
