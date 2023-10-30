@@ -4,7 +4,7 @@ using TranslationManagement.Api.Models;
 namespace TranslationManagement.Api.Controllers
 {
     [ApiController]
-    [Route("api/TranslatorsManagement/[action]")]
+    [Route("api/translators")]
     public class TranslatorManagementController : ControllerBase
     {
         private readonly ILogger<TranslatorManagementController> _logger;
@@ -18,10 +18,14 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpGet]
-        public TranslatorModel[] GetTranslators() => _context.Translators.ToArray();
-
-        [HttpGet]
-        public TranslatorModel[] GetTranslatorsByName(string name) => _context.Translators.Where(t => t.Name == name).ToArray();
+        public TranslatorModel[] GetTranslatorsByName([FromBody] string? name)
+        {
+            if (name != null)
+            {
+                return _context.Translators.Where(t => t.Name == name).ToArray();
+            }
+            return _context.Translators.ToArray();
+        }
 
         [HttpPost]
         public bool AddTranslator(TranslatorModel translator)
@@ -30,20 +34,25 @@ namespace TranslationManagement.Api.Controllers
             return _context.SaveChanges() > 0;
         }
 
-        [HttpPost]
-        public string UpdateTranslatorStatus(int Translator, string newStatus = "")
+        [HttpPut("{translator}")]
+        public string UpdateTranslatorStatus([FromBody] string newStatus, int translator)
         {
-            _logger.LogInformation($"User status update request: {newStatus} for user {Translator.ToString()}");
-            if (!Enum.IsDefined(typeof(TranslatorStatuses), newStatus))
+            _logger.LogInformation($"User status update request: {newStatus} for user {translator.ToString()}");
+            if (!IsValidTranslatorStatus(newStatus))
             {
                 throw new ArgumentException("unknown status");
             }
 
-            var job = _context.Translators.Single(j => j.Id == Translator);
+            var job = _context.Translators.Single(j => j.Id == translator);
             job.Status = newStatus;
             _context.SaveChanges();
 
             return "updated";
+        }
+
+        private bool IsValidTranslatorStatus(string status)
+        {
+            return Enum.IsDefined(typeof(TranslatorStatuses), status);
         }
     }
 }

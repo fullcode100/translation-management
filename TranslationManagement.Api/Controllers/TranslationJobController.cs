@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Xml.Linq;
 using TranslationManagement.Api.Models;
 using External.ThirdParty.Services;
-using Microsoft.VisualBasic;
 using TranslationManagement.Api.FileProcessors;
 
 namespace TranslationManagement.Api.Controllers
 {
     [ApiController]
-    [Route("api/jobs/[action]")]
+    [Route("api/jobs")]
     public class TranslationJobController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -24,7 +22,7 @@ namespace TranslationManagement.Api.Controllers
         public IActionResult GetJobs() => Ok(_context.TranslationJobs.ToArray());
 
         [HttpPost]
-        public async Task<IActionResult> CreateJob([FromForm] TranslationJob job)
+        public async Task<IActionResult> CreateJob(TranslationJob job)
         {
             job.Status = JobStatuses.New.ToString();
             SetPrice(job);
@@ -39,7 +37,7 @@ namespace TranslationManagement.Api.Controllers
             return Ok(success);
         }
 
-        [HttpPost]
+        [HttpPost("upload")]
         public async Task<IActionResult> CreateJobWithFile([FromForm] IFormFile file, [FromForm] string? customer)
         {
             var reader = new StreamReader(file.OpenReadStream());
@@ -62,11 +60,11 @@ namespace TranslationManagement.Api.Controllers
             return await CreateJob(newJob);
         }
 
-        [HttpPost]
-        public IActionResult UpdateJobStatus(int jobId, int translatorId, string newStatus = "")
+        [HttpPut]
+        public IActionResult UpdateJobStatus([FromForm] int jobId, [FromForm] int translatorId, [FromForm] string newStatus)
         {
             _logger.LogInformation($"Job status update request received: {newStatus} for job {jobId} by translator {translatorId}");
-            if (!IsValidStatus(newStatus))
+            if (!IsValidJobStatus(newStatus))
             {
                 return BadRequest("invalid status");
             }
@@ -109,9 +107,9 @@ namespace TranslationManagement.Api.Controllers
             }
         }
 
-        private bool IsValidStatus(string status)
+        private bool IsValidJobStatus(string status)
         {
-            return typeof(JobStatuses).GetProperties().Any(prop => prop.Name == status);
+            return Enum.IsDefined(typeof(JobStatuses), status);
         }
 
         private bool IsInvalidStatusChange(string currentStatus, string newStatus)
