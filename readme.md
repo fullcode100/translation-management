@@ -1,3 +1,8 @@
+# How to Run
+1. Inside `TranslationManagement.Api` folder, start the application by `dotnet run`
+2. Open `https://localhost:7075` on browser
+3. After the frontend is being built, you can see the application on the browser
+
 # Project description
 This app should help us manage translators and jobs they work on. 
 It is currently a working proof of concept but it needs a bit of polishing and a couple of features. 
