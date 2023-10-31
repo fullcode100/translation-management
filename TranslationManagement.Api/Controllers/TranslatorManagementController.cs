@@ -17,7 +17,7 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTranslatorsByName([FromBody] string? name)
+        public IActionResult GetTranslatorsByName([FromQuery] string? name)
         {
             if (name != null)
             {
@@ -27,7 +27,7 @@ namespace TranslationManagement.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddTranslator(Translator translator)
+        public async Task<IActionResult> AddTranslator([FromForm] Translator translator)
         {
             return Ok(await repository.CreateTranslatorAsync(translator));
         }
